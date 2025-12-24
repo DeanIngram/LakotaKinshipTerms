@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Lakota Kinship Terms</title>
+<style>
+  body { 
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; 
+    background:#FFF; 
+    padding:20px; 
+  }
+  
+  .container { 
+    max-width: 1050px; 
+    margin:auto; 
+    background:#AFD6FF; 
+    padding:20px; 
+    border-radius:8px;
+  }
+
+  .headline {
+    font-size:36px;
+    padding:0px;
+    line-height: 36px;
+    margin: 0px;
+  }
+  
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  
+  .control label { 
+    display:block; 
+    font-weight:600; 
+    margin-bottom:8px; 
+  }
+  
+  .control select { 
+    width:100%; 
+    padding:10px; 
+    font-size:24px; 
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    border-radius: 12px;
+    color: #000;
+    padding-right: 36px;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background-image:
+      linear-gradient(45deg, transparent 50%, #000 50%),
+      linear-gradient(135deg, #000 50%, transparent 50%);
+    background-position:
+      calc(100% - 20px) calc(50% - 4px),
+      calc(100% - 14px) calc(50% - 4px);
+    background-size: 6px 6px;
+    background-repeat: no-repeat;
+  }
+
+  .row { 
+    display:flex; 
+    align-items:flex-start; 
+    gap:20px; 
+    margin-top:18px; 
+  }
+  
+  .image-placeholder {
+    width:250px; 
+    height:250px; 
+    background:#ddd; 
+    border-radius:12px;
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    color:#666; 
+    text-align:center; 
+    flex-shrink:0;
+    border: 1px solid black;
+    overflow: hidden;
+  }
+
+  .outputWrap { 
+    flex:1; 
+  }
+  
+  .outputTitle { 
+    font-weight:700; margin:0 0 8px; 
+  }
+  .outputBox { 
+    background:#FFF; 
+    border-radius:6px; 
+    padding:14px; 
+    min-height:70px; 
+  }
+
+  .term { 
+    font-size:24px; 
+    line-height:1.25; 
+  }
+  
+  .note { 
+    font-size:12px; 
+    color:#666; 
+    margin-top:6px; 
+  }
+  
+  .muted { 
+    color:#888; 
+  }
+
+  .divider { 
+    height:1px; 
+    background:#e6e6e6; 
+    margin:22px 0; 
+  }
+  
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="headline">
+    <h1>Lakota Kinship terms</h1>
+  </div>
+  <div class="divider"></div>
+  <!-- Top Controls -->
+  <div class="controls">
+    <div class="control">
+      <label for="formSelect">Grammatical person / use</label>
+      <select id="formSelect">
+        <option value="">— Select Form —</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label for="relationshipSelect">Kinship relationship</label>
+      <select id="relationshipSelect">
+        <option value="">— Select Relationship —</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Male Speaker -->
+  <div class="row">
+    <div class="image-placeholder" id="maleImageBox"><img id="man" width="250" height="250" alt="wičȟáša" src="images/man.jpg"></div>
+    <div class="outputWrap">
+      <div class="outputTitle" id="maleTitle">Male Speaker</div>
+      <div class="outputBox" id="maleOutput"><span class="muted">Select a form and relationship.</span></div>
+    </div>
+  </div>
+
+  <!-- Female Speaker -->
+<div class="row" id="femaleRow">
+  <div class="image-placeholder"><img id="woman" width="250" height="250" alt="wiŋyáŋ" src="images/woman.jpg"></div>
+  <div class="outputWrap">
+    <div class="outputTitle">Female Speaker</div>
+    <div class="outputBox" id="femaleOutput"><span class="muted">Select a form and relationship.</span></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// =======================
+// DATA MODEL
+// =======================
+/*
+Each relationship has:
+  label: "Older brother"
+  speakers:
+    - male:   { forms: { vocative:{term,alts?}, p1:{term,alts?}, ... } }
+    - female: { forms: { ... } }
+    - both:   { forms: { ... } }  <-- use when terms are identical for male/female speakers
+
+Each form entry:
+  term: "tȟuŋkášila"   (the main/formal term displayed)
+  alts: [              (optional; displayed as a note under the main term)
+    { term:"kaká", dialect:"Southern", note:"familiar" },
+    { term:"lalá", dialect:"Northern", note:"familiar" }
+  ]
+*/
+
+const relationships = {
+  grandfather: {
+    label: "Grandfather",
+    speakers: {
+      both: {
+        forms: {
+          vocative: {
+            term: "tȟuŋkášila",
+            alts: [
+              { term: "kaká", dialect: "Southern", note: "familiar" },
+              { term: "lalá", dialect: "Northern", note: "familiar" }
+            ]
+          },
+          p1: {
+            term: "tȟuŋkášila",
+            alts: [
+              { term: "kaká", dialect: "Southern", note: "familiar" },
+              { term: "lalá", dialect: "Northern", note: "familiar" }
+            ]
+          },
+          // Fill these when you have them:
+          p2s: { term: "nitȟúŋkašila" },
+          p2p: { term: "nitȟúŋkašilapi" },
+          p3s: { term: "tȟuŋkášitku" },
+          p3p: { term: "tȟuŋkášitkupi" }
+        }
+      }
+    }
+  },
+
+  grandmother: {
+    label: "Grandmother",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "uŋčí" },
+          p1: { term: "uŋčí" },
+          p2s: { term: "nikȟúŋši" },
+          p2p: { term: "nikȟúŋšipi" },
+          p3s: { term: "kȟuŋšítku" },
+          p3p: { term: "kȟuŋšítkupi" }
+        }
+      }
+    }
+  },
+  
+  father: {
+    label: "Father",
+    speakers: {
+      both: {
+        forms: {
+          vocative: {
+            term: "até",
+            alts: [
+              { term: "até", dialect: "", note: "Sometimes father's brother" },
+              { term: "atéla", dialect: "", note: "father's brother" }
+            ]
+          },
+          p1: { term: "até" },
+          p2s: { term: "niyáte" },
+          p2p: { term: "niyátepi" },
+          p3s: { term: "atkúku" },
+          p3p: { term: "atkúkupi" }
+        }
+      }
+    }
+  },
+  
+  mother: {
+    label: "Mother",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "iná" },
+          p1: { term: "iná" },
+          p2s: { term: "nihúŋ" },
+          p2p: { term: "nihúŋpi" },
+          p3s: { term: "huŋkú" },
+          p3p: { term: "huŋkúpi" }
+        }
+      }
+    }
+  },
+
+  older_brother: {
+    label: "Older Brother",
+    speakers: {
+      male: {
+        forms: {
+          vocative: { term: "čhiyé" },
+          p1:       { term: "čhiyé" },
+          p2s:      { term: "ničíye" },
+          p2p:      { term: "ničhíyepi" },
+          p3s:      { term: "čhiyéku" },
+          p3p:      { term: "čhiyékupi" }
+        }
+      },
+      female: {
+        forms: {
+          vocative: { term: "thibló" },
+          p1:       { term: "thibló" },
+          p2s:      { term: "nithíblo" },
+          p2p:      { term: "nithíblopi" },
+          p3s:      { term: "thiblóku" },
+          p3p:      { term: "thiblókupi" }
+        }
+      }
+    }
+  },
+  
+  younger_brother: {
+    label: "Younger Brother",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "misúŋ" },
+          p1: { term: "misúŋka, misúŋkala" },
+          p2s: { term: "nisúŋka, nisúŋkala" },
+          p2p: { term: "nisúŋkapi, nisúŋkalapi" },
+          p3s: { term: "suŋkáku" },
+          p3p: { term: "suŋkákupi" }
+        }
+      }
+    }
+  },
+  
+  older_sister: {
+    label: "Older Sister",
+    speakers: {
+      male: {
+        forms: {
+          vocative: { term: "tȟaŋké" },
+          p1:       { term: "tȟaŋké" },
+          p2s:      { term: "nitȟáŋke" },
+          p2p:      { term: "nitȟáŋkepi" },
+          p3s:      { term: "tȟaŋkéku" },
+          p3p:      { term: "tȟaŋkékupi" }
+        }
+      },
+      female: {
+        forms: {
+          vocative: { term: "čhuwé" },
+          p1:       { term: "čhuwé" },
+          p2s:      { term: "ničhúwe" },
+          p2p:      { term: "ničhúwepi" },
+          p3s:      { term: "čhuwéku" },
+          p3p:      { term: "čhuwépi" }
+        }
+      }
+    }
+  },
+  
+  younger_sister: {
+    label: "Younger Sister",
+    speakers: {
+      male: {
+        forms: {
+          vocative: { term: "tȟaŋkší" },
+          p1:       { term: "tȟaŋkší, mitȟáŋkšila" },
+          p2s:      { term: "nitȟáŋkši" },
+          p2p:      { term: "nitȟáŋkšipi" },
+          p3s:      { term: "tȟaŋkšítku" },
+          p3p:      { term: "tȟaŋkšítkupi" }
+        }
+      },
+      female: {
+        forms: {
+          vocative: { term: "mitȟáŋ" },
+          p1:       { term: "mitȟáŋka, mitȟáŋkala" },
+          p2s:      { term: "nitȟáŋka, nitȟáŋkala" },
+          p2p:      { term: "nitȟáŋkapi, nitȟáŋkalapi" },
+          p3s:      { term: "tȟaŋkáku" },
+          p3p:      { term: "tȟaŋkákupi" }
+        }
+      }
+    }
+  },
+  
+  son: {
+    label: "Son",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "čhíŋkš, čhiŋkší" },
+          p1: { term: "čhíŋkš, mičhiŋkší" },
+          p2s: { term: "ničhíŋkši" },
+          p2p: { term: "ničhíŋkšipi" },
+          p3s: { term: "čhiŋkšíku" },
+          p3p: { term: "čhiŋkšíkupi" }
+        }
+      }
+    }
+  },
+  
+  daughter: {
+    label: "Daughter",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "čhúŋkš, čhuŋkší" },
+          p1: { term: "čhuŋkší, mičhúŋkši, mičhúŋwiŋtku" },
+          p2s: { term: "ničhúŋkši, ničhúŋwiŋtku" },
+          p2p: { term: "ničhúŋkšipi, ničhúŋwiŋtkupi" },
+          p3s: { term: "čhuŋwíŋtku" },
+          p3p: { term: "čhuŋwíŋtkupi" }
+        }
+      }
+    }
+  },
+  
+  husband: {
+    label: "Husband",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "wičháȟča" },
+          p1: { term: "mihíŋgna" },
+          p2s: { term: "nihíŋgna" },
+          p2p: { term: "mihíŋgnapi" },
+          p3s: { term: "hiŋgnáku" },
+          p3p: { term: "hiŋgnákupi" }
+        }
+      }
+    }
+  },
+  
+  wife: {
+    label: "Wife",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "winúȟča" },
+          p1: { term: "mitȟáwiču" },
+          p2s: { term: "nitȟáwiču" },
+          p2p: { term: "nitȟáwičupi" },
+          p3s: { term: "tȟawíču" },
+          p3p: { term: "tȟawíčupi" }
+        }
+      }
+    }
+  },
+  
+  child: {
+    label: "Child",
+    speakers: {
+      both: {
+        forms: {
+          p1: { term: "mičhíŋča" },
+          p2s: { term: "ničhíŋča" },
+          p2p: { term: "ničhíŋčapi" },
+          p3s: { term: "čhiŋčá" },
+          p3p: { term: "čhiŋčápi" }
+        }
+      }
+    }
+  },
+  
+  grandchild: {
+    label: "Grandchild",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "tȟakóža, tȟakožá" },
+          p1: { term: "mitȟákoža" },
+          p2s: { term: "nitȟákoža" },
+          p2p: { term: "nitȟákožapi" },
+          p3s: { term: "tȟakóžakpaku" },
+          p3p: { term: "tȟakóžakpakupi" }
+        }
+      }
+    }
+  },
+  
+  uncle: {
+    label: "Uncle",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { 
+            term: "lekší",
+            alts: [
+              { term: "lekšíla", dialect: "", note: "A man married to one's father's or mother's sister" }            
+            ]
+          },
+          p1: { term: "lekší" },
+          p2s: { term: "nilékši" },
+          p2p: { term: "nilékšipi" },
+          p3s: { term: "lekšíku" },
+          p3p: { term: "lekšíkupi" }
+        }
+      }
+    }
+  },
+  
+  auntie: {
+    label: "Auntie",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "thuwíŋ",
+            alts: [
+              { term: "inála", dialect: "", note: "Mother's sister" },
+              { term: "thuwíŋla", dialect: "", note: "A woman married to one's father's or mother's brother" }
+            ] },
+          p1: { term: "thuwíŋ" },
+          p2s: { term: "nithúwiŋ" },
+          p2p: { term: "nithúwiŋpi" },
+          p3s: { term: "thuwíŋču" },
+          p3p: { term: "thuwíŋčupi" }
+        }
+      }
+    }
+  },
+  
+  nephew: {
+    label: "Nephew",
+    speakers: {
+      male: {
+        forms: {
+          vocative: { term: "tȟuŋšká" },
+          p1:       { term: "tȟuŋšká, mitȟúŋška" },
+          p2s:      { term: "nitȟúŋška" },
+          p2p:      { term: "nitȟúŋškapi" },
+          p3s:      { term: "tȟuŋškáku" },
+          p3p:      { term: "tȟuŋškákupi" }
+        }
+      },
+      female: {
+        forms: {
+          vocative: { term: "tȟošká" },
+          p1:       { term: "tȟošká, mitȟóška" },
+          p2s:      { term: "nitȟóška" },
+          p2p:      { term: "nitȟóškapi" },
+          p3s:      { term: "tȟoškáku" },
+          p3p:      { term: "tȟoškákupi" }
+        }
+      }
+    }
+  },
+  
+  niece: {
+    label: "Niece",
+    speakers: {
+      male: {
+        forms: {
+          vocative: { term: "tȟuŋžáŋ" },
+          p1:       { term: "tȟuŋžáŋ, mitȟúŋžaŋ" },
+          p2s:      { term: "nitȟúŋžaŋ" },
+          p2p:      { term: "nitȟúŋžaŋpi" },
+          p3s:      { term: "tȟuŋžáŋku" },
+          p3p:      { term: "tȟuŋžáŋkupi" }
+        }
+      },
+      female: {
+        forms: {
+          vocative: { term: "tȟožáŋ" },
+          p1:       { term: "tȟožáŋ, mitȟóžaŋ" },
+          p2s:      { term: "nitȟóžaŋ" },
+          p2p:      { term: "nitȟóžaŋpi" },
+          p3s:      { term: "tȟožáŋku" },
+          p3p:      { term: "tȟožáŋkupi" }
+        }
+      }
+    }
+  },
+  
+  male_cousin: {
+    label: "Male Cousin",
+    speakers: {
+      male: {
+        forms: {
+          vocative: { term: "tȟaŋháŋši" },
+          p1:       { term: "tȟaŋháŋši" },
+          p2s:      { term: "nitȟáŋhaŋši" },
+          p2p:      { term: "nitȟáŋhaŋšipi" },
+          p3s:      { term: "tȟaŋháŋšitku" },
+          p3p:      { term: "tȟaŋháŋšitkupi" }
+        }
+      },
+      female: {
+        forms: {
+          vocative: { term: "šič'éši" },
+          p1:       { term: "šič'éši" },
+          p2s:      { term: "nišíč'eši" },
+          p2p:      { term: "nišíč'ešipi" },
+          p3s:      { term: "šič'éšitku" },
+          p3p:      { term: "šič'éšitkupi" }
+        }
+      }
+    }
+  },
+  
+  female_cousin: {
+    label: "Female Cousin",
+    speakers: {
+      male: {
+        forms: {
+          vocative: { term: "haŋkáši" },
+          p1:       { term: "haŋkáši" },
+          p2s:      { term: "niháŋkaši" },
+          p2p:      { term: "niháŋkašipi" },
+          p3s:      { term: "haŋkášitku" },
+          p3p:      { term: "haŋkášitkupi" }
+        }
+      },
+      female: {
+        forms: {
+          vocative: { term: "sčépȟaŋši" },
+          p1:       { term: "sčépȟaŋši" },
+          p2s:      { term: "nisčépȟaŋši" },
+          p2p:      { term: "nisčépȟaŋšipi" },
+          p3s:      { term: "sčépȟaŋšitku" },
+          p3p:      { term: "sčépȟaŋšitkupi" }
+        }
+      }
+    }
+  },
+  
+  brother_in_law: {
+    label: "Brother In Law",
+    speakers: {
+      male: {
+        forms: {
+          vocative: { term: "tȟaŋháŋ" },
+          p1:       { term: "tȟaŋháŋ" },
+          p2s:      { term: "nitȟáŋhaŋ" },
+          p2p:      { term: "nitȟáŋhaŋpi" },
+          p3s:      { term: "tȟaŋháŋku" },
+          p3p:      { term: "tȟaŋháŋkupi" }
+        }
+      },
+      female: {
+        forms: {
+          vocative: { term: "šič'é" },
+          p1:       { term: "šič'é" },
+          p2s:      { term: "nišíč'e" },
+          p2p:      { term: "nišíč'epi" },
+          p3s:      { term: "šič'éku" },
+          p3p:      { term: "šič'ékupi" }
+        }
+      }
+    }
+  },
+  
+  sister_in_law: {
+    label: "Sister In Law",
+    speakers: {
+      male: {
+        forms: {
+          vocative: { term: "haŋká" },
+          p1:       { term: "haŋká" },
+          p2s:      { term: "niháŋka" },
+          p2p:      { term: "niháŋkapi" },
+          p3s:      { term: "haŋkáku" },
+          p3p:      { term: "haŋkákupi" }
+        }
+      },
+      female: {
+        forms: {
+          vocative: { term: "sčepȟáŋ" },
+          p1:       { term: "sčepȟáŋ" },
+          p2s:      { term: "nisčépȟaŋ" },
+          p2p:      { term: "nisčépȟaŋpi" },
+          p3s:      { term: "sčepȟáŋku" },
+          p3p:      { term: "sčepȟáŋkupi" }
+        }
+      }
+    }
+  },
+  
+  spouse_partner: {
+    label: "Spouse or Partner",
+    speakers: {
+      both: {
+        forms: {
+          p1: { term: "mahásaŋni" },
+          p2s: { term: "nihásaŋni" },
+          p2p: { term: "nihásaŋnipi" },
+          p3s: { term: "hasáŋni" },
+          p3p: { term: "hasáŋnipi" }
+        }
+      }
+    }
+  },
+  
+  mother_in_law: {
+    label: "Mother In Law",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "uŋčíši" },
+          p1: { term: "uŋčíši" },
+          p2s: { term: "nikȟúŋ" },
+          p2p: { term: "nikȟúŋpi" },
+          p3s: { term: "kȟúŋku" },
+          p3p: { term: "kȟúŋkupi" }
+        }
+      }
+    }
+  },
+  
+  father_in_law: {
+    label: "Father In Law",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "tȟuŋkáŋ" },
+          p1: { term: "tȟuŋkáŋ" },
+          p2s: { term: "nitȟúŋkaŋ" },
+          p2p: { term: "nitȟúŋkaŋpi" },
+          p3s: { term: "tȟuŋkáŋku" },
+          p3p: { term: "tȟuŋkáŋkupi" }
+        }
+      }
+    }
+  },
+  
+  child_in_law: {
+    label: "Child In Law",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "tȟakóš" },
+          p1: { term: "tȟakóš, mitȟákoš" },
+          p2s: { term: "nitȟákoš" },
+          p2p: { term: "nitȟákošpi" },
+          p3s: { term: "tȟakóšku" },
+          p3p: { term: "tȟakóškupi" }
+        }
+      }
+    }
+  },
+  
+  co_parent_in_law: {
+    label: "Co-Parent In Law",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "omáwahitȟuŋ" },
+          p1: { term: "omáwahitȟuŋ" },
+          p2s: { term: "nitȟómawahitȟuŋ" },
+          p2p: { term: "nitȟómawahitȟuŋpi" },
+          p3s: { term: "tȟómawahitȟuŋku" },
+          p3p: { term: "tȟómawahitȟuŋkupi" }
+        }
+      }
+    }
+  },
+  
+  cross_cousin_cross_sibling: {
+    label: "Cross Cousin or Cross Sibling",
+    speakers: {
+      both: {
+        forms: {
+          vocative: { term: "mihákata" },
+          p1: { term: "mihákata" },
+          p2s: { term: "nihákata" },
+          p2p: { term: "nihákatapi" },
+          p3s: { term: "hakátaku" },
+          p3p: { term: "hakátakupi" }
+        }
+      }
+    }
+  },
+  
+  step_child: {
+    label: "Step Child",
+    speakers: {
+      both: {
+        forms: {
+          p1: { term: "mitȟáwaǧaŋ" },
+          p2s: { term: "nitȟáwaǧaŋ" },
+          p2p: { term: "nitȟáwaǧaŋpi" },
+          p3s: { term: "tȟawáǧaŋku" },
+          p3p: { term: "tȟawáǧaŋkupi" }
+        }
+      }
+    }
+  }
+  // Add more relationships here...
+};
+
+const FORMS = [
+  { id: "vocative", label: "Vocative (address)" },
+  { id: "p1",       label: "1st person (my)" },
+  { id: "p2s",      label: "2nd person singular (your)" },
+  { id: "p2p",      label: "2nd person plural (your all’s)" },
+  { id: "p3s",      label: "3rd person singular (his/her)" },
+  { id: "p3p",      label: "3rd person plural (their)" }
+];
+
+// =======================
+// UI SETUP
+// =======================
+
+function populateFormDropdown() {
+  const sel = document.getElementById("formSelect");
+  for (const f of FORMS) {
+    const opt = document.createElement("option");
+    opt.value = f.id;
+    opt.textContent = f.label;
+    sel.appendChild(opt);
+  }
+}
+
+function populateRelationshipDropdown() {
+  const sel = document.getElementById("relationshipSelect");
+  Object.entries(relationships).forEach(([id, rel]) => {
+    const opt = document.createElement("option");
+    opt.value = id;
+    opt.textContent = rel.label;
+    sel.appendChild(opt);
+  });
+}
+
+// =======================
+// LOOKUP + RENDERING
+// =======================
+
+/**
+ * Returns a form entry object: { term: string, alts?: [...] } or null.
+ * Priority:
+ *   1) rel.speakers[speaker].forms[formId]
+ *   2) rel.speakers.both.forms[formId]  (fallback when same term for both sexes)
+ */
+function getFormEntry(rel, speaker, formId) {
+  return (
+    rel?.speakers?.[speaker]?.forms?.[formId] ??
+    rel?.speakers?.both?.forms?.[formId] ??
+    null
+  );
+}
+
+function renderEntry(entry) {
+  if (!entry || !entry.term) return `<span class="muted">—</span>`;
+
+  // Treat literal "—" as missing data (optional, but usually nicer)
+  if (entry.term.trim() === "—") return `<span class="muted">—</span>`;
+
+  const termHtml = `<div class="term">${escapeHtml(entry.term)}</div>`;
+
+  const alts = Array.isArray(entry.alts) ? entry.alts : [];
+  if (!alts.length) return termHtml;
+
+  // Build note line like: "kaká — Southern — familiar • lalá — Northern — familiar"
+  const noteParts = alts.map(a => {
+    const bits = [];
+    if (a.term) bits.push(a.term);
+    if (a.dialect) bits.push(a.dialect);
+    if (a.note) bits.push(a.note);
+    return bits.join(" — ");
+  });
+
+  const noteHtml = `<div class="note">${escapeHtml(noteParts.join(" • "))}</div>`;
+  return termHtml + noteHtml;
+}
+
+function updateOutputs() {
+  const formId = document.getElementById("formSelect").value;
+  const relId  = document.getElementById("relationshipSelect").value;
+
+  const maleOut = document.getElementById("maleOutput");
+  const femOut  = document.getElementById("femaleOutput");
+  const femRow  = document.getElementById("femaleRow");
+
+  if (!formId || !relId) {
+    maleOut.innerHTML = `<span class="muted">Select a form and relationship.</span>`;
+    femOut.innerHTML  = `<span class="muted">Select a form and relationship.</span>`;
+    if (femRow) femRow.style.display = "";   // show by default
+    return;
+  }
+
+  const rel = relationships[relId];
+
+  // If relationship defines speakers.both, it's common to both sexes -> hide female panel
+  const isCommon = !!rel?.speakers?.both;
+
+  const maleEntry = getFormEntry(rel, "male", formId);
+  const femEntry  = getFormEntry(rel, "female", formId);
+
+  maleOut.innerHTML = renderEntry(maleEntry);
+
+  if (isCommon) {
+    // hide the female row entirely
+    if (femRow) femRow.style.display = "none";
+  } else {
+    // show female row and render normally
+    if (femRow) femRow.style.display = "";
+    femOut.innerHTML  = renderEntry(femEntry);
+  }
+  
+  const maleTitle = document.getElementById("maleTitle");
+  if (maleTitle) {
+    maleTitle.textContent = isCommon ? "Speaker (same for male & female)" : "Male Speaker";
+  }
+  
+  const maleImageBox = document.getElementById("maleImageBox");
+
+  if (maleImageBox) {
+    maleImageBox.innerHTML = isCommon
+    ? `<img id="manwoman" width="250" height="250" alt="wičȟášawiŋyáŋ" src="images/manwoman.jpg">`
+    : `<img id="man" width="250" height="250" alt="wičȟáša" src="images/man.jpg">`;
+  }
+}
+
+// Minimal escape to keep notes/terms safe in HTML
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+populateFormDropdown();
+populateRelationshipDropdown();
+document.getElementById("formSelect").addEventListener("change", updateOutputs);
+document.getElementById("relationshipSelect").addEventListener("change", updateOutputs);
+</script>
+
+</body>
+</html>
